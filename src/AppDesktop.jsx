@@ -52,9 +52,14 @@ const calcStats = matches => {
   return s;
 };
 
+const PHOTOS_KEY = "septica_photos";
+const getPhotos = () => { try { return JSON.parse(localStorage.getItem(PHOTOS_KEY)||"{}"); } catch { return {}; } };
+
 // ── PRIMITIVES ────────────────────────────────────────────────────────────
 const Avatar = ({alias,size=36})=>{
   const p=PLAYERS[alias]||{};
+  const photo=getPhotos()[alias];
+  if(photo) return <img src={photo} alt={alias} style={{width:size,height:size,borderRadius:"50%",objectFit:"cover",flexShrink:0,boxShadow:`0 2px 8px ${p.color}44`}}/>;
   return <div style={{width:size,height:size,borderRadius:"50%",background:p.color||"#94A3B8",
     display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",
     fontSize:size*0.32,fontWeight:700,flexShrink:0,boxShadow:`0 2px 8px ${p.color}44`}}>
@@ -66,6 +71,9 @@ const AvatarPair = ({aliases,size=36,light=false})=>(
   <div style={{display:"flex",alignItems:"center"}}>
     {aliases.map((alias,i)=>{
       const p=PLAYERS[alias]||{};
+      const photo=getPhotos()[alias];
+      if(photo) return <img key={alias} src={photo} alt={alias} style={{marginLeft:i===0?0:-Math.round(size*0.12),zIndex:i===0?2:1,
+        position:"relative",width:size,height:size,borderRadius:"50%",objectFit:"cover",flexShrink:0}}/>;
       return <div key={alias} style={{marginLeft:i===0?0:-Math.round(size*0.12),zIndex:i===0?2:1,
         position:"relative",width:size,height:size,borderRadius:"50%",
         background:light?"rgba(255,255,255,0.22)":(p.color||"#94A3B8"),
@@ -213,7 +221,7 @@ export default function SepticaClubDesktop() {
   const [deletePin,     setDeletePin]     = useState("");
   const [deletePinErr,  setDeletePinErr]  = useState(false);
   const [deleteTarget,  setDeleteTarget]  = useState(null);
-  const [profilePhotos, setProfilePhotos] = useState({});
+  const [profilePhotos, setProfilePhotos] = useState(()=>getPhotos());
   const [showPhotoPin,  setShowPhotoPin]  = useState(false);
   const [photoPin,      setPhotoPin]      = useState("");
   const [photoPinErr,   setPhotoPinErr]   = useState(false);
@@ -229,7 +237,11 @@ export default function SepticaClubDesktop() {
   const handlePhotoUpload = useCallback((alias,file)=>{
     if(!file) return;
     const r = new FileReader();
-    r.onload = e => setProfilePhotos(prev=>({...prev,[alias]:e.target.result}));
+    r.onload = e => {
+      const updated = {...getPhotos(),[alias]:e.target.result};
+      localStorage.setItem(PHOTOS_KEY,JSON.stringify(updated));
+      setProfilePhotos(updated);
+    };
     r.readAsDataURL(file);
   },[]);
   const requestPhotoChange = useCallback(alias=>{setPhotoTarget(alias);setShowPhotoPin(true);},[]);

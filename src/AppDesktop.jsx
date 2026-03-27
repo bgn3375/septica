@@ -213,6 +213,11 @@ export default function SepticaClubDesktop() {
   const [deletePin,     setDeletePin]     = useState("");
   const [deletePinErr,  setDeletePinErr]  = useState(false);
   const [deleteTarget,  setDeleteTarget]  = useState(null);
+  const [profilePhotos, setProfilePhotos] = useState({});
+  const [showPhotoPin,  setShowPhotoPin]  = useState(false);
+  const [photoPin,      setPhotoPin]      = useState("");
+  const [photoPinErr,   setPhotoPinErr]   = useState(false);
+  const [photoTarget,   setPhotoTarget]   = useState(null);
 
   useEffect(()=>{setTimeout(()=>setMounted(true),60);},[]);
 
@@ -221,6 +226,13 @@ export default function SepticaClubDesktop() {
   const openAdd     = useCallback(()=>{setEditMatch(null);setShowPin(true);},[]);
   const openEdit    = useCallback(m=>{setEditMatch(m);setShowPin(true);},[]);
   const deleteMatch = useCallback(id=>{setMatches(prev=>prev.filter(m=>m.id!==id));setSelMatch(null);setPage("meciuri");},[]);
+  const handlePhotoUpload = useCallback((alias,file)=>{
+    if(!file) return;
+    const r = new FileReader();
+    r.onload = e => setProfilePhotos(prev=>({...prev,[alias]:e.target.result}));
+    r.readAsDataURL(file);
+  },[]);
+  const requestPhotoChange = useCallback(alias=>{setPhotoTarget(alias);setShowPhotoPin(true);},[]);
   const playerStats = calcStats(matches);
 
   // ── TOP NAV ───────────────────────────────────────────────────────────────
@@ -495,7 +507,16 @@ export default function SepticaClubDesktop() {
                   borderRight:i===0?`1px solid ${T.border}`:"none",
                   display:"flex",alignItems:"center",gap:14,
                 }}>
-                  <Avatar alias={alias} size={48}/>
+                  <div style={{position:"relative",cursor:"pointer",flexShrink:0}} onClick={()=>requestPhotoChange(alias)}>
+                    {profilePhotos[alias]
+                      ?<img src={profilePhotos[alias]} alt={alias} style={{width:48,height:48,borderRadius:"50%",objectFit:"cover"}}/>
+                      :<Avatar alias={alias} size={48}/>}
+                    <div style={{position:"absolute",bottom:0,right:0,width:16,height:16,borderRadius:"50%",
+                      background:"rgba(255,255,255,0.9)",display:"flex",alignItems:"center",justifyContent:"center",
+                      fontSize:8,boxShadow:"0 1px 3px rgba(0,0,0,0.15)"}}>✎</div>
+                    <input id={`pu-${alias}`} type="file" accept="image/*" style={{display:"none"}}
+                      onChange={e=>handlePhotoUpload(alias,e.target.files[0])}/>
+                  </div>
                   <div>
                     <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
                       <span style={{fontSize:15,fontWeight:700,color:T.text}}>{p.full}</span>
@@ -734,6 +755,13 @@ export default function SepticaClubDesktop() {
           <PinKeypad pin={deletePin} setPin={setDeletePin} pinErr={deletePinErr} setPinErr={setDeletePinErr}
             title="Șterge meciul" titleColor="#DC2626"
             onSuccess={()=>{deleteMatch(deleteTarget);setShowDeletePin(false);setDeletePin("");setDeleteTarget(null);}}/>
+        </Modal>
+      )}
+      {showPhotoPin&&(
+        <Modal onClose={()=>{setShowPhotoPin(false);setPhotoPin("");setPhotoPinErr(false);setPhotoTarget(null);}}>
+          <PinKeypad pin={photoPin} setPin={setPhotoPin} pinErr={photoPinErr} setPinErr={setPhotoPinErr}
+            title="Schimbă poza"
+            onSuccess={()=>{setShowPhotoPin(false);setPhotoPin("");document.getElementById(`pu-${photoTarget}`).click();setPhotoTarget(null);}}/>
         </Modal>
       )}
     </div>

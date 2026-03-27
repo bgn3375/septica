@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { loadPhotos, savePhoto } from "./supabase.js";
 
 // ── THEME ─────────────────────────────────────────────────────────────────
 const T = {
@@ -299,13 +300,24 @@ export default function SepticaClub() {
 
   useEffect(()=>{ setTimeout(()=>setMounted(true),60); },[]);
 
+  useEffect(()=>{
+    loadPhotos().then(photos=>{
+      if(Object.keys(photos).length>0){
+        localStorage.setItem(PHOTOS_KEY,JSON.stringify(photos));
+        setProfilePhotos(photos);
+      }
+    });
+  },[]);
+
   const handlePhotoUpload = useCallback((alias,file)=>{
     if(!file) return;
     const r = new FileReader();
     r.onload = e => {
-      const updated = {...getPhotos(),[alias]:e.target.result};
+      const url = e.target.result;
+      const updated = {...getPhotos(),[alias]:url};
       localStorage.setItem(PHOTOS_KEY,JSON.stringify(updated));
       setProfilePhotos(updated);
+      savePhoto(alias, url);
     };
     r.readAsDataURL(file);
   },[]);

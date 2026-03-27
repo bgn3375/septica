@@ -103,7 +103,7 @@ const GradBtn = ({children,onClick,sm=false})=>(
     onMouseLeave={e=>e.currentTarget.style.opacity="1"}
     style={{background:T.gradient,border:"none",borderRadius:T.rFull,
       padding:sm?"8px 18px":"10px 24px",cursor:"pointer",
-      fontSize:sm?12:14,fontWeight:600,color:"#fff",
+      fontSize:sm?16:14,fontWeight:600,color:"#fff",
       boxShadow:"0 2px 12px rgba(26,159,212,0.35)",transition:"opacity 0.15s",
       whiteSpace:"nowrap"}}>
     {children}
@@ -231,7 +231,7 @@ export default function SepticaClubDesktop() {
       borderBottom:`1px solid ${T.border}`,
       position:"sticky", top:0, zIndex:50,
       display:"flex", alignItems:"center", justifyContent:"space-between",
-      padding:"0 32px", height:60,
+      padding:"0 180px", height:60,
     }}>
       {/* Logo */}
       <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
@@ -239,7 +239,7 @@ export default function SepticaClubDesktop() {
           display:"flex",alignItems:"center",justifyContent:"center",
           fontSize:20,fontWeight:900,color:"#fff",boxShadow:"0 2px 10px rgba(26,159,212,0.35)"}}>7</div>
         <div>
-          <div style={{fontSize:15,fontWeight:700,color:T.text,lineHeight:1.1}}>Șeptică pe Vorbite</div>
+          <div style={{fontSize:24,fontWeight:700,color:T.text,lineHeight:1.1}}>Șeptică pe Vorbite</div>
         </div>
       </div>
 

@@ -400,7 +400,7 @@ export default function SepticaClub() {
             </div>
           </Card>
           <SecLabel>Meciuri recente</SecLabel>
-          <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:110 }}>
+          <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:16 }}>
             {matches.slice(0,3).map((m,i)=>(
               <MatchCard key={m.id} m={m} isLatest={i===0} onPress={()=>openMatch(m)} />
             ))}

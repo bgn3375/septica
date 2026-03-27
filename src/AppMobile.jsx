@@ -125,8 +125,8 @@ const GradBtn = ({ children, onClick, full=false, sm=false }) => (
   </button>
 );
 
-const FloatingAddBtn = ({ onClick, bottom, label="+ Adaugă meci nou" }) => (
-  <div style={{ position:"absolute", bottom, left:12, right:12, zIndex:35 }}>
+const FloatingAddBtn = ({ onClick, label="+ Adaugă meci nou" }) => (
+  <div style={{ padding:"8px 12px", flexShrink:0 }}>
     <button onClick={onClick}
       onMouseEnter={e=>{e.currentTarget.style.opacity="0.9";e.currentTarget.style.transform="translateY(-1px)";}}
       onMouseLeave={e=>{e.currentTarget.style.opacity="1";e.currentTarget.style.transform="translateY(0)";}}
@@ -347,7 +347,7 @@ export default function SepticaClub() {
 
   // ── BOTTOM NAV ───────────────────────────────────────────────────────────
   const BottomNav = () => (
-    <div style={{ position:"absolute", bottom:0, left:0, right:0,
+    <div style={{ flexShrink:0,
       background:"rgba(255,255,255,0.97)", borderTop:"1.5px solid transparent",
       backgroundImage:`linear-gradient(rgba(255,255,255,0.97),rgba(255,255,255,0.97)),${T.gradient}`,
       backgroundOrigin:"border-box", backgroundClip:"padding-box,border-box",
@@ -413,13 +413,13 @@ export default function SepticaClub() {
             </div>
           </Card>
           <SecLabel>Meciuri recente</SecLabel>
-          <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:120 }}>
+          <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:16 }}>
             {matches.slice(0,3).map((m,i)=>(
               <MatchCard key={m.id} m={m} isLatest={i===0} onPress={()=>openMatch(m)} />
             ))}
           </div>
         </div>
-        <FloatingAddBtn onClick={openAdd} bottom={FAB_BOTTOM} />
+        <FloatingAddBtn onClick={openAdd} />
         <BottomNav />
       </div>
     );
@@ -431,7 +431,7 @@ export default function SepticaClub() {
       <TopBar />
       <div style={{ flex:1, overflowY:"auto", padding:"12px 10px 0" }}>
         <div style={{ fontSize:18, fontWeight:700, color:T.text, letterSpacing:"-0.02em", marginBottom:12 }}>Lista de meciuri</div>
-        <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:120 }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:16 }}>
           {matches.map((m,idx)=>(
             <div key={m.id} style={{ opacity:mounted?1:0, transform:mounted?"none":"translateY(6px)",
               transition:`opacity 0.3s ${idx*0.05}s, transform 0.3s ${idx*0.05}s` }}>
@@ -440,7 +440,7 @@ export default function SepticaClub() {
           ))}
         </div>
       </div>
-      <FloatingAddBtn onClick={openAdd} bottom={FAB_BOTTOM} />
+      <FloatingAddBtn onClick={openAdd} />
       <BottomNav />
     </div>
   );
@@ -467,7 +467,7 @@ export default function SepticaClub() {
                 padding:"4px 9px", cursor:"pointer", fontSize:11, fontWeight:500, color:"#DC2626", transition:"all 0.15s" }}>🗑</button>
           </div>
         } />
-        <div style={{ flex:1, overflowY:"auto", paddingBottom:120 }}>
+        <div style={{ flex:1, overflowY:"auto", paddingBottom:16 }}>
           <div style={{ background:heroBg, padding:"20px 20px 18px", textAlign:"center" }}>
             {m.weekend&&<div style={{ display:"inline-block", marginBottom:10, background:"rgba(255,255,255,0.18)", borderRadius:T.rFull, padding:"3px 10px", fontSize:10, color:"#fff" }}>🏆 {m.weekend}</div>}
             <div style={{ fontSize:9, color:"rgba(255,255,255,0.65)", textTransform:"uppercase", letterSpacing:"0.06em", marginBottom:2 }}>{m.date}</div>
@@ -532,7 +532,7 @@ export default function SepticaClub() {
       return (
         <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
           <TopBar back="Jucători" backFn={()=>setSelPlayer(null)} />
-          <div style={{ flex:1, overflowY:"auto", paddingBottom:120 }}>
+          <div style={{ flex:1, overflowY:"auto", paddingBottom:16 }}>
             <div style={{ background:heroBg, padding:"24px 20px 20px", textAlign:"center" }}>
               <div style={{ position:"relative", display:"inline-block", cursor:"pointer" }}
                 onClick={()=>document.getElementById(`pu-${alias}`).click()}>
@@ -652,7 +652,7 @@ export default function SepticaClub() {
             </div>
           ))}
         </div>
-        <FloatingAddBtn onClick={openAdd} bottom={FAB_BOTTOM} label="+ Adaugă poză" />
+        <FloatingAddBtn onClick={openAdd} label="+ Adaugă poză" />
         <BottomNav />
       </div>
     );

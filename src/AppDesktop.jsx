@@ -396,8 +396,8 @@ export default function SepticaClubDesktop() {
                 {aWin?"Paul & BGN":"Laur & GxG"} câștigă
               </div>
               <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:28}}>
-                {[{aliases:["Paul","BGN"],label:"Paul & BGN",score:sW,dim:!aWin},
-                  {aliases:["Laur","GxG"],label:"Laur & GxG",score:sL,dim:aWin}].map((t,i)=>(
+                {[{aliases:["Paul","BGN"],label:"Paul & BGN",score:aWin?sW:sL,dim:!aWin},
+                  {aliases:["Laur","GxG"],label:"Laur & GxG",score:aWin?sL:sW,dim:aWin}].map((t,i)=>(
                   <div key={i} style={{textAlign:"center"}}>
                     <div style={{display:"flex",justifyContent:"center",marginBottom:8}}>
                       <AvatarPair aliases={t.aliases} size={36} light/>

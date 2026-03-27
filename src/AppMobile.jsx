@@ -270,50 +270,6 @@ const PinKeypad = ({ pin, setPin, onSuccess, pinErr, setPinErr, title, titleColo
   </>
 );
 
-// ── PHONE SHELL ───────────────────────────────────────────────────────────
-const PhoneShell = ({ children }) => (
-  <div style={{ display:"flex", justifyContent:"center", alignItems:"flex-start",
-    minHeight:"100vh", background:"#E8EEF2", padding:"32px 16px 48px",
-    fontFamily:"'Inter',sans-serif" }}>
-    <div style={{ width:290, background:"#1C2E3E", borderRadius:52, padding:11, position:"relative",
-      boxShadow:"0 0 0 1px #2A4055, 0 0 0 2.5px #1C2E3E, inset 0 1px 0 rgba(255,255,255,0.07), 0 48px 120px rgba(0,0,0,0.55)", flexShrink:0 }}>
-      <div style={{ position:"absolute", left:-4, top:100, width:4, height:32, background:"#2C2C2E", borderRadius:"3px 0 0 3px", boxShadow:"0 44px 0 #2C2C2E, 0 86px 0 #2C2C2E" }} />
-      <div style={{ position:"absolute", right:-4, top:122, width:4, height:56, background:"#2C2C2E", borderRadius:"0 3px 3px 0" }} />
-      <div style={{ background:T.bg, borderRadius:42, overflow:"hidden", height:580,
-        position:"relative", display:"flex", flexDirection:"column" }}>
-        <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)",
-          width:90, height:26, background:"#1C2E3E", borderRadius:"0 0 18px 18px",
-          zIndex:20, display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
-          <div style={{ width:9, height:9, background:"#2C4055", borderRadius:"50%" }} />
-          <div style={{ width:32, height:4, background:"#2C4055", borderRadius:3 }} />
-        </div>
-        <div style={{ padding:"14px 18px 4px", display:"flex", justifyContent:"space-between", alignItems:"center",
-          fontSize:11, fontWeight:600, color:T.text, background:"rgba(240,247,249,0.98)", flexShrink:0, zIndex:10 }}>
-          <span>9:41</span>
-          <div style={{ display:"flex", gap:5, alignItems:"center" }}>
-            <svg width="16" height="11" viewBox="0 0 16 11" fill="none">
-              <rect x="0" y="4" width="3" height="7" rx="0.5" fill="#0A2540"/>
-              <rect x="4.5" y="2.5" width="3" height="8.5" rx="0.5" fill="#0A2540"/>
-              <rect x="9" y="1" width="3" height="10" rx="0.5" fill="#0A2540"/>
-              <rect x="13.5" y="0" width="2.5" height="11" rx="0.5" fill="#0A2540" opacity="0.28"/>
-            </svg>
-            <svg width="15" height="11" viewBox="0 0 15 11" fill="#0A2540">
-              <path d="M7.5 2.4C9.6 2.4 11.5 3.3 12.9 4.8L14.2 3.4C12.4 1.6 9.9 0.5 7.5 0.5S2.6 1.6 0.8 3.4L2.1 4.8C3.5 3.3 5.4 2.4 7.5 2.4Z" opacity="0.38"/>
-              <path d="M7.5 5.2C9 5.2 10.3 5.8 11.2 6.8L12.5 5.4C11.2 4 9.4 3.1 7.5 3.1S3.8 4 2.5 5.4L3.8 6.8C4.7 5.8 6 5.2 7.5 5.2Z" opacity="0.7"/>
-              <circle cx="7.5" cy="9.5" r="1.5"/>
-            </svg>
-            <svg width="25" height="11" viewBox="0 0 25 11" fill="none">
-              <rect x=".5" y=".5" width="21" height="10" rx="2.5" stroke="#0A2540" strokeOpacity=".35"/>
-              <rect x="1.5" y="1.5" width="18" height="8" rx="1.5" fill="#0A2540"/>
-              <path d="M23 3.5C23.8 3.9 24.5 4.7 24.5 5.5C24.5 6.3 23.8 7.1 23 7.5V3.5Z" fill="#0A2540" opacity=".35"/>
-            </svg>
-          </div>
-        </div>
-        {children}
-      </div>
-    </div>
-  </div>
-);
 
 // ══ MAIN APP ══════════════════════════════════════════════════════════════
 export default function SepticaClub() {
@@ -506,7 +462,7 @@ export default function SepticaClub() {
               {aWin?"Paul & BGN":"Laur & GxG"} câștigă
             </div>
             <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"center", gap:16 }}>
-              {[{aliases:["Paul","BGN"],label:"Paul & BGN",score:sW,dim:!aWin},{aliases:["Laur","GxG"],label:"Laur & GxG",score:sL,dim:aWin}].map((team,i)=>(
+              {[{aliases:["Paul","BGN"],label:"Paul & BGN",score:aWin?sW:sL,dim:!aWin},{aliases:["Laur","GxG"],label:"Laur & GxG",score:aWin?sL:sW,dim:aWin}].map((team,i)=>(
                 <div key={i} style={{ textAlign:"center" }}>
                   <div style={{ display:"flex", justifyContent:"center", marginBottom:4 }}>
                     <AvatarPair aliases={team.aliases} size={24} light />
@@ -845,21 +801,20 @@ export default function SepticaClub() {
 
   // ── RENDER ────────────────────────────────────────────────────────────────
   return (
-    <PhoneShell>
+    <div style={{ minHeight:"100vh", background:T.bg, fontFamily:"'Inter',sans-serif",
+      display:"flex", flexDirection:"column", position:"relative" }}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-      <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden", position:"relative" }}>
-        {showAdd ? <AddMatchPage /> : (
-          <>
-            {page==="home"    && <HomePage />}
-            {page==="meciuri" && <MatchesPage />}
-            {page==="match"   && <MatchDetailPage />}
-            {page==="players" && <PlayersPage />}
-            {page==="album"   && <AlbumPage />}
-          </>
-        )}
-        {showPin       && !showAdd && <PinModal />}
-        {showDeletePin && <DeletePinModal />}
-      </div>
-    </PhoneShell>
+      {showAdd ? <AddMatchPage /> : (
+        <>
+          {page==="home"    && <HomePage />}
+          {page==="meciuri" && <MatchesPage />}
+          {page==="match"   && <MatchDetailPage />}
+          {page==="players" && <PlayersPage />}
+          {page==="album"   && <AlbumPage />}
+        </>
+      )}
+      {showPin       && !showAdd && <PinModal />}
+      {showDeletePin && <DeletePinModal />}
+    </div>
   );
 }

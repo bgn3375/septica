@@ -240,7 +240,6 @@ export default function SepticaClubDesktop() {
           fontSize:20,fontWeight:900,color:"#fff",boxShadow:"0 2px 10px rgba(26,159,212,0.35)"}}>7</div>
         <div>
           <div style={{fontSize:15,fontWeight:700,color:T.text,lineHeight:1.1}}>Șeptică pe Vorbite</div>
-          <div style={{fontSize:9,color:T.text3,letterSpacing:"0.07em",textTransform:"uppercase"}}>Est. 1995</div>
         </div>
       </div>
 

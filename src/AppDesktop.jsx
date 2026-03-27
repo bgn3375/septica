@@ -515,7 +515,8 @@ export default function SepticaClubDesktop() {
                       background:"rgba(255,255,255,0.9)",display:"flex",alignItems:"center",justifyContent:"center",
                       fontSize:8,boxShadow:"0 1px 3px rgba(0,0,0,0.15)"}}>✎</div>
                     <input id={`pu-${alias}`} type="file" accept="image/*" style={{display:"none"}}
-                      onChange={e=>handlePhotoUpload(alias,e.target.files[0])}/>
+                      onClick={e=>e.stopPropagation()}
+                      onChange={e=>{e.stopPropagation();handlePhotoUpload(alias,e.target.files[0]);}}/>
                   </div>
                   <div>
                     <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
@@ -761,7 +762,7 @@ export default function SepticaClubDesktop() {
         <Modal onClose={()=>{setShowPhotoPin(false);setPhotoPin("");setPhotoPinErr(false);setPhotoTarget(null);}}>
           <PinKeypad pin={photoPin} setPin={setPhotoPin} pinErr={photoPinErr} setPinErr={setPhotoPinErr}
             title="Schimbă poza"
-            onSuccess={()=>{setShowPhotoPin(false);setPhotoPin("");document.getElementById(`pu-${photoTarget}`).click();setPhotoTarget(null);}}/>
+            onSuccess={()=>{const t=photoTarget;setShowPhotoPin(false);setPhotoPin("");setPhotoTarget(null);setTimeout(()=>document.getElementById(`pu-${t}`).click(),100);}}/>
         </Modal>
       )}
     </div>

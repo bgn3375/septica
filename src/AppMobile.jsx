@@ -388,7 +388,7 @@ export default function SepticaClub() {
       <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden", opacity:mounted?1:0, transition:"opacity 0.45s" }}>
         <TopBar />
         <div style={{ flex:1, overflowY:"auto", padding:"10px 10px 0" }}>
-          <Card style={{ marginBottom:10, background:T.gradient, border:"none", boxShadow:"0 6px 20px rgba(26,159,212,0.22)" }}>
+          <Card style={{ marginBottom:10, background:`linear-gradient(135deg, rgba(27,196,160,0.82), rgba(26,159,212,0.82), rgba(26,111,212,0.82)), url('/hero.jpg')`, backgroundSize:"cover", backgroundPosition:"center top", border:"none", boxShadow:"0 6px 20px rgba(26,159,212,0.22)" }}>
             <div style={{ padding:"14px 16px 8px" }}>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
                 <div style={{ flex:1, textAlign:"center" }}>
@@ -431,7 +431,7 @@ export default function SepticaClub() {
       <TopBar />
       <div style={{ flex:1, overflowY:"auto", padding:"12px 10px 0" }}>
         <div style={{ fontSize:18, fontWeight:700, color:T.text, letterSpacing:"-0.02em", marginBottom:12 }}>Lista de meciuri</div>
-        <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:110 }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:16 }}>
           {matches.map((m,idx)=>(
             <div key={m.id} style={{ opacity:mounted?1:0, transform:mounted?"none":"translateY(6px)",
               transition:`opacity 0.3s ${idx*0.05}s, transform 0.3s ${idx*0.05}s` }}>
@@ -467,7 +467,7 @@ export default function SepticaClub() {
                 padding:"4px 9px", cursor:"pointer", fontSize:11, fontWeight:500, color:"#DC2626", transition:"all 0.15s" }}>🗑</button>
           </div>
         } />
-        <div style={{ flex:1, overflowY:"auto", paddingBottom:70 }}>
+        <div style={{ flex:1, overflowY:"auto", paddingBottom:16 }}>
           <div style={{ background:heroBg, padding:"20px 20px 18px", textAlign:"center" }}>
             {m.weekend&&<div style={{ display:"inline-block", marginBottom:10, background:"rgba(255,255,255,0.18)", borderRadius:T.rFull, padding:"3px 10px", fontSize:10, color:"#fff" }}>🏆 {m.weekend}</div>}
             <div style={{ fontSize:9, color:"rgba(255,255,255,0.65)", textTransform:"uppercase", letterSpacing:"0.06em", marginBottom:2 }}>{m.date}</div>
@@ -532,7 +532,7 @@ export default function SepticaClub() {
       return (
         <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
           <TopBar back="Jucători" backFn={()=>setSelPlayer(null)} />
-          <div style={{ flex:1, overflowY:"auto", paddingBottom:70 }}>
+          <div style={{ flex:1, overflowY:"auto", paddingBottom:16 }}>
             <div style={{ background:heroBg, padding:"24px 20px 20px", textAlign:"center" }}>
               <div style={{ position:"relative", display:"inline-block", cursor:"pointer" }}
                 onClick={()=>document.getElementById(`pu-${alias}`).click()}>

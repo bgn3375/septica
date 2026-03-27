@@ -14,10 +14,6 @@ const T = {
   r:4, rMd:6, rLg:8, rXl:12, rFull:9999,
 };
 
-const NAV_H      = 64;
-const FAB_GAP    = 12;
-const FAB_BOTTOM = NAV_H + FAB_GAP;
-
 // ── DATA ──────────────────────────────────────────────────────────────────
 const PLAYERS = {
   Paul:{ full:"Paul Roman",      alias:"Paul", team:"A", initials:"PR", captain:true,  color:"#F4845F" },
@@ -125,8 +121,11 @@ const GradBtn = ({ children, onClick, full=false, sm=false }) => (
   </button>
 );
 
+const BOTTOM_BAR = 64;
+const FAB_H = 56;
+
 const FloatingAddBtn = ({ onClick, label="+ Adaugă meci nou" }) => (
-  <div style={{ padding:"8px 12px", flexShrink:0 }}>
+  <div style={{ position:"fixed", bottom:BOTTOM_BAR, left:0, right:0, padding:"8px 12px", zIndex:40 }}>
     <button onClick={onClick}
       onMouseEnter={e=>{e.currentTarget.style.opacity="0.9";e.currentTarget.style.transform="translateY(-1px)";}}
       onMouseLeave={e=>{e.currentTarget.style.opacity="1";e.currentTarget.style.transform="translateY(0)";}}
@@ -347,7 +346,7 @@ export default function SepticaClub() {
 
   // ── BOTTOM NAV ───────────────────────────────────────────────────────────
   const BottomNav = () => (
-    <div style={{ flexShrink:0,
+    <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:40,
       background:"rgba(255,255,255,0.97)", borderTop:"1.5px solid transparent",
       backgroundImage:`linear-gradient(rgba(255,255,255,0.97),rgba(255,255,255,0.97)),${T.gradient}`,
       backgroundOrigin:"border-box", backgroundClip:"padding-box,border-box",
@@ -413,7 +412,7 @@ export default function SepticaClub() {
             </div>
           </Card>
           <SecLabel>Meciuri recente</SecLabel>
-          <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:16 }}>
+          <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:BOTTOM_BAR+FAB_H }}>
             {matches.slice(0,3).map((m,i)=>(
               <MatchCard key={m.id} m={m} isLatest={i===0} onPress={()=>openMatch(m)} />
             ))}
@@ -431,7 +430,7 @@ export default function SepticaClub() {
       <TopBar />
       <div style={{ flex:1, overflowY:"auto", padding:"12px 10px 0" }}>
         <div style={{ fontSize:18, fontWeight:700, color:T.text, letterSpacing:"-0.02em", marginBottom:12 }}>Lista de meciuri</div>
-        <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:16 }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:BOTTOM_BAR+FAB_H }}>
           {matches.map((m,idx)=>(
             <div key={m.id} style={{ opacity:mounted?1:0, transform:mounted?"none":"translateY(6px)",
               transition:`opacity 0.3s ${idx*0.05}s, transform 0.3s ${idx*0.05}s` }}>
@@ -467,7 +466,7 @@ export default function SepticaClub() {
                 padding:"4px 9px", cursor:"pointer", fontSize:11, fontWeight:500, color:"#DC2626", transition:"all 0.15s" }}>🗑</button>
           </div>
         } />
-        <div style={{ flex:1, overflowY:"auto", paddingBottom:16 }}>
+        <div style={{ flex:1, overflowY:"auto", paddingBottom:BOTTOM_BAR }}>
           <div style={{ background:heroBg, padding:"20px 20px 18px", textAlign:"center" }}>
             {m.weekend&&<div style={{ display:"inline-block", marginBottom:10, background:"rgba(255,255,255,0.18)", borderRadius:T.rFull, padding:"3px 10px", fontSize:10, color:"#fff" }}>🏆 {m.weekend}</div>}
             <div style={{ fontSize:9, color:"rgba(255,255,255,0.65)", textTransform:"uppercase", letterSpacing:"0.06em", marginBottom:2 }}>{m.date}</div>
@@ -532,7 +531,7 @@ export default function SepticaClub() {
       return (
         <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
           <TopBar back="Jucători" backFn={()=>setSelPlayer(null)} />
-          <div style={{ flex:1, overflowY:"auto", paddingBottom:16 }}>
+          <div style={{ flex:1, overflowY:"auto", paddingBottom:BOTTOM_BAR }}>
             <div style={{ background:heroBg, padding:"24px 20px 20px", textAlign:"center" }}>
               <div style={{ position:"relative", display:"inline-block", cursor:"pointer" }}
                 onClick={()=>document.getElementById(`pu-${alias}`).click()}>
@@ -575,7 +574,7 @@ export default function SepticaClub() {
     return (
       <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
         <TopBar />
-        <div style={{ flex:1, overflowY:"auto", padding:"12px 10px 70px" }}>
+        <div style={{ flex:1, overflowY:"auto", padding:`12px 10px ${BOTTOM_BAR}px` }}>
           <div style={{ fontSize:18, fontWeight:700, color:T.text, letterSpacing:"-0.02em", marginBottom:14 }}>Jucători</div>
           {["A","B"].map(team=>{
             const isA=team==="A", wins=matches.filter(m=>m.winner===team).length, teamName=isA?"Paul & BGN":"Laur & GxG";
@@ -618,7 +617,7 @@ export default function SepticaClub() {
     return (
       <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
         <TopBar />
-        <div style={{ flex:1, overflowY:"auto", padding:"12px 10px 110px" }}>
+        <div style={{ flex:1, overflowY:"auto", padding:`12px 10px ${BOTTOM_BAR+FAB_H}px` }}>
           {years.map(year=>(
             <div key={year} style={{ marginBottom:18 }}>
               <div style={{ fontSize:11, fontWeight:700, color:T.text3, letterSpacing:"0.06em", marginBottom:8 }}>{year}</div>

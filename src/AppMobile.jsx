@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { loadPhotos, savePhoto } from "./supabase.js";
+import { loadPhotos, savePhoto, syncLocalToSupabase } from "./supabase.js";
 
 // ── THEME ─────────────────────────────────────────────────────────────────
 const T = {
@@ -301,7 +301,7 @@ export default function SepticaClub() {
   useEffect(()=>{ setTimeout(()=>setMounted(true),60); },[]);
 
   useEffect(()=>{
-    loadPhotos().then(photos=>{
+    syncLocalToSupabase().then(()=>loadPhotos()).then(photos=>{
       if(Object.keys(photos).length>0){
         localStorage.setItem(PHOTOS_KEY,JSON.stringify(photos));
         setProfilePhotos(photos);

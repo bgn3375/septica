@@ -17,3 +17,15 @@ export async function savePhoto(alias, dataUrl) {
     .upsert({ alias, data: dataUrl, updated_at: new Date().toISOString() });
   if (error) console.error("savePhoto:", error);
 }
+
+export async function syncLocalToSupabase() {
+  try {
+    const local = JSON.parse(localStorage.getItem("septica_photos") || "{}");
+    const entries = Object.entries(local);
+    if (entries.length === 0) return;
+    const remote = await loadPhotos();
+    for (const [alias, data] of entries) {
+      if (!remote[alias]) await savePhoto(alias, data);
+    }
+  } catch (e) { console.error("syncLocalToSupabase:", e); }
+}

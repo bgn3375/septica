@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { loadPhotos, savePhoto } from "./supabase.js";
+import { loadPhotos, savePhoto, syncLocalToSupabase } from "./supabase.js";
 
 const T = {
   bg:"#F0F7F9", card:"#FFFFFF", muted:"#E8F4F6", border:"#C8E6EC",
@@ -230,7 +230,7 @@ export default function SepticaClubDesktop() {
 
   useEffect(()=>{setTimeout(()=>setMounted(true),60);},[]);
   useEffect(()=>{
-    loadPhotos().then(photos=>{
+    syncLocalToSupabase().then(()=>loadPhotos()).then(photos=>{
       if(Object.keys(photos).length>0){
         localStorage.setItem(PHOTOS_KEY,JSON.stringify(photos));
         setProfilePhotos(photos);

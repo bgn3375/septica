@@ -317,11 +317,17 @@ export default function SepticaClub() {
     });
   },[]);
 
-  // Auto-sync matches from Supabase every 10s
+  // Auto-sync matches + photos from Supabase every 10s
   useEffect(()=>{
     const iv = setInterval(()=>{
       loadMatches().then(data=>{
         if(data && data.length>0) setMatches(data);
+      });
+      loadPhotos().then(photos=>{
+        if(Object.keys(photos).length>0){
+          localStorage.setItem(PHOTOS_KEY,JSON.stringify(photos));
+          setProfilePhotos(photos);
+        }
       });
     }, 10000);
     return ()=>clearInterval(iv);

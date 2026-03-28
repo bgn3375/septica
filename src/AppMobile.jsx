@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { loadPhotos, savePhoto, syncLocalToSupabase, syncInitialMatches, upsertMatch, deleteMatchDb } from "./supabase.js";
+import { loadPhotos, loadMatches, savePhoto, syncLocalToSupabase, syncInitialMatches, upsertMatch, deleteMatchDb } from "./supabase.js";
 
 // ── THEME ─────────────────────────────────────────────────────────────────
 const T = {
@@ -32,7 +32,7 @@ const INITIAL_MATCHES = [
   { id:1, date:"28 Ian 26", location:"", winner:"A", score:"2-0",
     partide:[{setWinner:"A",W:57,L:7},{setWinner:"A",W:54,L:28}], quote:"", photos:0 },
   { id:4, date:"16 Dec 25", weekend:"Finala 2025", location:"București",
-    winner:"B", score:"8-5", setsA:5, setsB:8, partide:[], photos:4, quote:"" },
+    winner:"B", score:"5-8", setsA:5, setsB:8, partide:[], photos:4, quote:"" },
 ];
 
 // ── DATE HELPERS ──────────────────────────────────────────────────────────
@@ -317,6 +317,16 @@ export default function SepticaClub() {
     });
   },[]);
 
+  // Auto-sync matches from Supabase every 10s
+  useEffect(()=>{
+    const iv = setInterval(()=>{
+      loadMatches().then(data=>{
+        if(data && data.length>0) setMatches(data);
+      });
+    }, 10000);
+    return ()=>clearInterval(iv);
+  },[]);
+
   const handlePhotoUpload = useCallback((alias,file)=>{
     if(!file) return;
     const r = new FileReader();
@@ -337,6 +347,7 @@ export default function SepticaClub() {
   const deleteMatch = useCallback(id=>{ setMatches(prev=>prev.filter(m=>m.id!==id)); deleteMatchDb(id); setPage("meciuri"); },[]);
 
   const playerStats = calcStats(matches);
+  const sortedMatches = [...matches].sort((a,b)=>parseDate(b.date)-parseDate(a.date));
 
   // ── TOP BAR ──────────────────────────────────────────────────────────────
   const TopBar = ({ back, backFn, action }) => (
@@ -355,7 +366,7 @@ export default function SepticaClub() {
               display:"flex", alignItems:"center", justifyContent:"center",
               fontSize:15, fontWeight:900, color:"#fff",
               boxShadow:"0 2px 8px rgba(26,159,212,0.3)" }}>7</div>
-            <span style={{ fontSize:20, fontWeight:700, color:T.text }}>Șeptică pe Vorbite</span>
+            <span style={{ fontSize:26, fontWeight:700, color:T.text }}>Șeptică pe Vorbite</span>
           </div>
           <span style={{ fontSize:10, color:T.text3, letterSpacing:"0.06em", textTransform:"uppercase" }}>Est. 1995</span>
         </div>
@@ -433,7 +444,7 @@ export default function SepticaClub() {
           </Card>
           <SecLabel>Meciuri recente</SecLabel>
           <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:BOTTOM_BAR+FAB_H }}>
-            {matches.slice(0,3).map((m,i)=>(
+            {sortedMatches.slice(0,3).map((m,i)=>(
               <MatchCard key={m.id} m={m} isLatest={i===0} onPress={()=>openMatch(m)} />
             ))}
           </div>
@@ -451,7 +462,7 @@ export default function SepticaClub() {
       <div style={{ flex:1, overflowY:"auto", padding:"12px 10px 0" }}>
         <div style={{ fontSize:18, fontWeight:700, color:T.text, letterSpacing:"-0.02em", marginBottom:12 }}>Lista de meciuri</div>
         <div style={{ display:"flex", flexDirection:"column", gap:6, paddingBottom:BOTTOM_BAR+FAB_H }}>
-          {matches.map((m,idx)=>(
+          {sortedMatches.map((m,idx)=>(
             <div key={m.id} style={{ opacity:mounted?1:0, transform:mounted?"none":"translateY(6px)",
               transition:`opacity 0.3s ${idx*0.05}s, transform 0.3s ${idx*0.05}s` }}>
               <MatchCard m={m} onPress={()=>openMatch(m)} />
@@ -652,7 +663,7 @@ export default function SepticaClub() {
                         {m.date}{m.location?` · 📍 ${m.location}`:""}{m.weekend?` · 🏆 ${m.weekend}`:""}
                       </div>
                       <div style={{ fontSize:13, fontWeight:700, color:T.text, marginBottom:2 }}>
-                        {aWin?"Paul & BGN":"Laur & GxG"} câștigă {m.score.replace("-","–")}
+                        {(()=>{ const [sa,sb]=m.score.split("-"); return `${aWin?"Paul & BGN":"Laur & GxG"} câștigă ${aWin?sa:sb}–${aWin?sb:sa}`; })()}
                       </div>
                       {m.partide.length>0&&<div style={{ display:"flex", gap:3, marginBottom:m.quote?4:0 }}>
                         {m.partide.map((p,j)=><SetPill key={j} p={p} matchWinner={m.winner} />)}

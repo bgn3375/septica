@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { loadPhotos, savePhoto, syncLocalToSupabase, syncInitialMatches, upsertMatch, deleteMatchDb } from "./supabase.js";
+import { loadPhotos, loadMatches, savePhoto, syncLocalToSupabase, syncInitialMatches, upsertMatch, deleteMatchDb } from "./supabase.js";
 
 const T = {
   bg:"#F0F7F9", card:"#FFFFFF", muted:"#E8F4F6", border:"#C8E6EC",
@@ -30,7 +30,7 @@ const INITIAL_MATCHES = [
   { id:1, date:"28 Ian 26", location:"", winner:"A", score:"2-0",
     partide:[{setWinner:"A",W:57,L:7},{setWinner:"A",W:54,L:28}], quote:"", photos:0 },
   { id:4, date:"16 Dec 25", weekend:"Finala 2025", location:"București",
-    winner:"B", score:"8-5", setsA:5, setsB:8, partide:[], photos:4, quote:"" },
+    winner:"B", score:"5-8", setsA:5, setsB:8, partide:[], photos:4, quote:"" },
 ];
 
 const MONTHS = ["Ian","Feb","Mar","Apr","Mai","Iun","Iul","Aug","Sep","Oct","Nov","Dec"];
@@ -245,6 +245,16 @@ export default function SepticaClubDesktop() {
     });
   },[]);
 
+  // Auto-sync matches from Supabase every 10s
+  useEffect(()=>{
+    const iv = setInterval(()=>{
+      loadMatches().then(data=>{
+        if(data && data.length>0) setMatches(data);
+      });
+    }, 10000);
+    return ()=>clearInterval(iv);
+  },[]);
+
   const openMatch   = useCallback(m=>{setSelMatch(m);setPage("match");},[]);
   const openPlayer  = useCallback(alias=>{setSelPlayer(alias);setPage("player");},[]);
   const openAdd     = useCallback(()=>{setEditMatch(null);setShowPin(true);},[]);
@@ -264,6 +274,7 @@ export default function SepticaClubDesktop() {
   },[]);
   const requestPhotoChange = useCallback(alias=>{setPhotoTarget(alias);setShowPhotoPin(true);},[]);
   const playerStats = calcStats(matches);
+  const sortedMatches = [...matches].sort((a,b)=>parseDate(b.date)-parseDate(a.date));
 
   // ── TOP NAV ───────────────────────────────────────────────────────────────
   const TopNav = ()=>(
@@ -360,10 +371,10 @@ export default function SepticaClubDesktop() {
               Vezi toate →
             </button>
           </div>
-          {matches.slice(0,4).map((m,i)=>(
+          {sortedMatches.slice(0,4).map((m,i)=>(
             <div key={m.id}>
               <MatchRow m={m} onClick={()=>openMatch(m)} isSelected={selMatch?.id===m.id}/>
-              {i<Math.min(matches.length,4)-1&&<Divider/>}
+              {i<Math.min(sortedMatches.length,4)-1&&<Divider/>}
             </div>
           ))}
         </Card>
@@ -384,10 +395,10 @@ export default function SepticaClubDesktop() {
             <div key={h} style={{fontSize:10,fontWeight:600,color:T.text3,textTransform:"uppercase",letterSpacing:"0.06em"}}>{h}</div>
           ))}
         </div>
-        {matches.map((m,i)=>(
+        {sortedMatches.map((m,i)=>(
           <div key={m.id}>
             <MatchRow m={m} onClick={()=>openMatch(m)} isSelected={selMatch?.id===m.id}/>
-            {i<matches.length-1&&<Divider/>}
+            {i<sortedMatches.length-1&&<Divider/>}
           </div>
         ))}
       </Card>
@@ -605,7 +616,7 @@ export default function SepticaClubDesktop() {
                         {m.date}{m.location?` · 📍 ${m.location}`:""}{m.weekend?` · 🏆 ${m.weekend}`:""}
                       </div>
                       <div style={{fontSize:15,fontWeight:700,color:T.text,marginBottom:5}}>
-                        {aWin?"Paul & BGN":"Laur & GxG"} câștigă {m.score.replace("-","–")}
+                        {(()=>{ const [sa,sb]=m.score.split("-"); return `${aWin?"Paul & BGN":"Laur & GxG"} câștigă ${aWin?sa:sb}–${aWin?sb:sa}`; })()}
                       </div>
                       {m.partide.length>0&&<div style={{display:"flex",gap:4,marginBottom:m.quote?6:0}}>
                         {m.partide.map((p,j)=><SetPill key={j} p={p} matchWinner={m.winner}/>)}

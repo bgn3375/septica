@@ -570,11 +570,14 @@ export default function SepticaClubDesktop() {
                       onChange={e=>{e.stopPropagation();handlePhotoUpload(alias,e.target.files[0]);}}/>
                   </div>
                   {photoUnlocked===alias&&(
-                    <label htmlFor={`pu-${alias}`} onClick={e=>e.stopPropagation()}
+                    <label onClick={e=>e.stopPropagation()}
                       style={{fontSize:11,fontWeight:600,color:T.accent,cursor:"pointer",
                         background:T.muted,borderRadius:T.r,padding:"4px 10px",
-                        border:`1px solid ${T.border}`,marginLeft:-8}}>
+                        border:`1px solid ${T.border}`,marginLeft:-8,position:"relative",overflow:"hidden"}}>
                       📷 Alege poza
+                      <input type="file" accept="image/*"
+                        style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",opacity:0,cursor:"pointer"}}
+                        onChange={e=>{e.stopPropagation();handlePhotoUpload(alias,e.target.files[0]);}} />
                     </label>
                   )}
                   <div>

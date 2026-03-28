@@ -588,10 +588,13 @@ export default function SepticaClub() {
                   onChange={e=>handlePhotoUpload(alias,e.target.files[0])} />
               </div>
               {photoUnlocked===alias&&(
-                <label htmlFor={`pu-${alias}`} style={{ display:"inline-block", marginTop:8, background:"rgba(255,255,255,0.25)",
+                <label style={{ display:"inline-block", marginTop:8, background:"rgba(255,255,255,0.25)",
                   borderRadius:T.rFull, padding:"6px 16px", fontSize:12, fontWeight:600, color:"#fff", cursor:"pointer",
-                  border:"1px solid rgba(255,255,255,0.4)" }}>
+                  border:"1px solid rgba(255,255,255,0.4)", position:"relative", overflow:"hidden" }}>
                   📷 Alege poza
+                  <input type="file" accept="image/*"
+                    style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%", opacity:0, cursor:"pointer" }}
+                    onChange={e=>handlePhotoUpload(alias,e.target.files[0])} />
                 </label>
               )}
               {p.captain&&<div style={{ display:"inline-block", marginTop:6, background:"rgba(255,255,255,0.18)",

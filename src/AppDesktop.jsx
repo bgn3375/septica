@@ -228,6 +228,7 @@ export default function SepticaClubDesktop() {
   const [photoPin,      setPhotoPin]      = useState("");
   const [photoPinErr,   setPhotoPinErr]   = useState(false);
   const [photoTarget,   setPhotoTarget]   = useState(null);
+  const [photoUnlocked, setPhotoUnlocked] = useState(null);
 
   useEffect(()=>{setTimeout(()=>setMounted(true),60);},[]);
   useEffect(()=>{
@@ -275,6 +276,7 @@ export default function SepticaClubDesktop() {
       localStorage.setItem(PHOTOS_KEY,JSON.stringify(updated));
       setProfilePhotos(updated);
       savePhoto(alias, url);
+      setPhotoUnlocked(null);
     };
     r.readAsDataURL(file);
   },[]);
@@ -555,7 +557,8 @@ export default function SepticaClubDesktop() {
                   borderRight:i===0?`1px solid ${T.border}`:"none",
                   display:"flex",alignItems:"center",gap:14,
                 }}>
-                  <div style={{position:"relative",cursor:"pointer",flexShrink:0}} onClick={()=>requestPhotoChange(alias)}>
+                  <div style={{position:"relative",cursor:"pointer",flexShrink:0}}
+                    onClick={()=>{ if(photoUnlocked!==alias) requestPhotoChange(alias); }}>
                     {profilePhotos[alias]
                       ?<img src={profilePhotos[alias]} alt={alias} style={{width:48,height:48,borderRadius:"50%",objectFit:"cover"}}/>
                       :<Avatar alias={alias} size={48}/>}
@@ -566,6 +569,14 @@ export default function SepticaClubDesktop() {
                       onClick={e=>e.stopPropagation()}
                       onChange={e=>{e.stopPropagation();handlePhotoUpload(alias,e.target.files[0]);}}/>
                   </div>
+                  {photoUnlocked===alias&&(
+                    <label htmlFor={`pu-${alias}`} onClick={e=>e.stopPropagation()}
+                      style={{fontSize:11,fontWeight:600,color:T.accent,cursor:"pointer",
+                        background:T.muted,borderRadius:T.r,padding:"4px 10px",
+                        border:`1px solid ${T.border}`,marginLeft:-8}}>
+                      📷 Alege poza
+                    </label>
+                  )}
                   <div>
                     <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
                       <span style={{fontSize:15,fontWeight:700,color:T.text}}>{p.full}</span>
@@ -758,19 +769,19 @@ export default function SepticaClubDesktop() {
               defaultValue={isEdit?(editMatch.quote||""):""}/>
           </Card>
           <GradBtn onClick={()=>{
-            const dateVal=dateRef.current?dateRef.current.value:"";
+            const dateVal=dateRef.current?.value || fmtDate(new Date());
             const dateParts=dateVal.split("-");
             const dateStr=dateParts.length===3?`${dateParts[2]} ${MONTHS[Number(dateParts[1])-1]} ${dateParts[0].slice(-2)}`:dateVal;
-            const quoteVal=quoteRef.current?quoteRef.current.value:"";
+            const quoteVal=quoteRef.current?.value?.trim() || "";
+            const locationVal=locationRef.current?.value?.trim() || "";
+            const weekendVal=weekendRef.current?.value?.trim() || "";
             let match;
             if(type==="weekend"){
-              const wName=weekendRef.current?weekendRef.current.value:"";
-              const loc=locationRef.current?locationRef.current.value:"";
-              const sA=scoreARef.current?Number(scoreARef.current.value)||0:0;
-              const sB=scoreBRef.current?Number(scoreBRef.current.value)||0:0;
+              const sA=Number(scoreARef.current?.value||0);
+              const sB=Number(scoreBRef.current?.value||0);
               match={
                 id:isEdit?editMatch.id:Date.now(),
-                date:dateStr, weekend:wName, location:loc,
+                date:dateStr, weekend:weekendVal, location:locationVal,
                 winner:winner||"A", score:`${sA}-${sB}`, setsA:sA, setsB:sB,
                 partide:[], photos:isEdit?editMatch.photos||0:0, quote:quoteVal,
               };
@@ -778,24 +789,24 @@ export default function SepticaClubDesktop() {
               const played=jocuri.filter(j=>j.a!==""&&j.b!=="");
               const partide=played.map(j=>{
                 const a=Number(j.a),b=Number(j.b);
-                const sw=a>b?(winner||"A"):(winner==="A"?"B":"A");
-                return {setWinner:sw,W:Math.max(a,b),L:Math.min(a,b)};
+                return a>b ? {setWinner:"A",W:a,L:b} : {setWinner:"B",W:b,L:a};
               });
-              const wA=partide.filter(p=>p.setWinner==="A").length;
-              const wB=partide.filter(p=>p.setWinner==="B").length;
+              const sW=partide.filter(p=>p.setWinner===(winner||"A")).length;
+              const sL=partide.length-sW;
               match={
                 id:isEdit?editMatch.id:Date.now(),
-                date:dateStr, location:"", winner:winner||"A",
-                score:`${wA}-${wB}`, partide, photos:isEdit?editMatch.photos||0:0, quote:quoteVal,
+                date:dateStr, location:locationVal, weekend:"",
+                winner:winner||"A", score:`${sW}-${sL}`,
+                partide, photos:isEdit?editMatch.photos||0:0, quote:quoteVal,
               };
             }
             if(isEdit){
-              setMatches(prev=>prev.map(m=>m.id===match.id?match:m));
+              setMatches(prev=>prev.map(m=>m.id===editMatch.id?match:m));
             } else {
               setMatches(prev=>[match,...prev]);
             }
             upsertMatch(match);
-            setShowAdd(false);setEditMatch(null);
+            setShowAdd(false);setEditMatch(null);setShowPin(false);
           }}>
             {isEdit?"✓ Salvează modificările":"✓ Salvează meciul"}
           </GradBtn>
@@ -851,7 +862,7 @@ export default function SepticaClubDesktop() {
         <Modal onClose={()=>{setShowPhotoPin(false);setPhotoPin("");setPhotoPinErr(false);setPhotoTarget(null);}}>
           <PinKeypad pin={photoPin} setPin={setPhotoPin} pinErr={photoPinErr} setPinErr={setPhotoPinErr}
             title="Schimbă poza"
-            onSuccess={()=>{const t=photoTarget;setShowPhotoPin(false);setPhotoPin("");setPhotoTarget(null);setTimeout(()=>document.getElementById(`pu-${t}`).click(),100);}}/>
+            onSuccess={()=>{setPhotoUnlocked(photoTarget);setShowPhotoPin(false);setPhotoPin("");setPhotoTarget(null);}}/>
         </Modal>
       )}
     </div>

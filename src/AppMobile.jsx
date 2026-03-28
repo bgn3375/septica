@@ -298,6 +298,11 @@ export default function SepticaClub() {
   const [deletePin,     setDeletePin]     = useState("");
   const [deletePinErr,  setDeletePinErr]  = useState(false);
   const [deleteTarget,  setDeleteTarget]  = useState(null);
+  const [showPhotoPin,  setShowPhotoPin]  = useState(false);
+  const [photoPin,      setPhotoPin]      = useState("");
+  const [photoPinErr,   setPhotoPinErr]   = useState(false);
+  const [photoTarget,   setPhotoTarget]   = useState(null);
+  const [photoUnlocked, setPhotoUnlocked] = useState(null);
   const [showAdd,       setShowAdd]       = useState(false);
 
   useEffect(()=>{ setTimeout(()=>setMounted(true),60); },[]);
@@ -342,6 +347,7 @@ export default function SepticaClub() {
       localStorage.setItem(PHOTOS_KEY,JSON.stringify(updated));
       setProfilePhotos(updated);
       savePhoto(alias, url);
+      setPhotoUnlocked(null);
     };
     r.readAsDataURL(file);
   },[]);
@@ -350,7 +356,8 @@ export default function SepticaClub() {
   const openPlayer  = useCallback(alias=>setSelPlayer(alias),[]);
   const openAdd     = useCallback(()=>{ setEditMatch(null); setShowPin(true); },[]);
   const openEdit    = useCallback(m=>{ setEditMatch(m); setShowPin(true); },[]);
-  const deleteMatch = useCallback(id=>{ setMatches(prev=>prev.filter(m=>m.id!==id)); deleteMatchDb(id); setPage("meciuri"); },[]);
+  const deleteMatch = useCallback(id=>{ setMatches(prev=>prev.filter(m=>m.id!==id)); deleteMatchDb(id); setSelMatch(null); setPage("meciuri"); },[]);
+  const requestPhotoChange = useCallback(alias=>{setPhotoTarget(alias);setShowPhotoPin(true);},[]);
 
   const playerStats = calcStats(matches);
   const sortedMatches = [...matches].sort((a,b)=>parseDate(b.date)-parseDate(a.date));
@@ -567,11 +574,11 @@ export default function SepticaClub() {
       const heroBg=isA?"linear-gradient(135deg,#F4845F,#E06040)":"linear-gradient(135deg,#D4A017,#B8880F)";
       return (
         <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden" }}>
-          <TopBar back="Jucători" backFn={()=>setSelPlayer(null)} />
+          <TopBar back="Jucători" backFn={()=>{setSelPlayer(null);setPhotoUnlocked(null);}} />
           <div style={{ flex:1, overflowY:"auto", paddingBottom:BOTTOM_BAR }}>
             <div style={{ background:heroBg, padding:"24px 20px 20px", textAlign:"center" }}>
               <div style={{ position:"relative", display:"inline-block", cursor:"pointer" }}
-                onClick={()=>document.getElementById(`pu-${alias}`).click()}>
+                onClick={()=>{ if(photoUnlocked!==alias) requestPhotoChange(alias); }}>
                 {profilePhotos[alias]
                   ?<img src={profilePhotos[alias]} alt={alias} style={{ width:64, height:64, borderRadius:"50%", objectFit:"cover", border:"3px solid rgba(255,255,255,0.6)" }}/>
                   :<Avatar alias={alias} size={64} />}
@@ -580,6 +587,13 @@ export default function SepticaClub() {
                 <input id={`pu-${alias}`} type="file" accept="image/*" style={{ display:"none" }}
                   onChange={e=>handlePhotoUpload(alias,e.target.files[0])} />
               </div>
+              {photoUnlocked===alias&&(
+                <label htmlFor={`pu-${alias}`} style={{ display:"inline-block", marginTop:8, background:"rgba(255,255,255,0.25)",
+                  borderRadius:T.rFull, padding:"6px 16px", fontSize:12, fontWeight:600, color:"#fff", cursor:"pointer",
+                  border:"1px solid rgba(255,255,255,0.4)" }}>
+                  📷 Alege poza
+                </label>
+              )}
               {p.captain&&<div style={{ display:"inline-block", marginTop:6, background:"rgba(255,255,255,0.18)",
                 borderRadius:T.rFull, padding:"2px 8px", fontSize:9, color:"#fff", textTransform:"uppercase" }}>⚑ Căpitan</div>}
               <div style={{ fontSize:18, fontWeight:700, color:"#fff", marginTop:p.captain?5:10, marginBottom:5 }}>{p.full}</div>
@@ -905,6 +919,19 @@ export default function SepticaClub() {
       )}
       {showPin       && !showAdd && <PinModal />}
       {showDeletePin && <DeletePinModal />}
+      {showPhotoPin && (
+        <div onClick={()=>{ setShowPhotoPin(false); setPhotoPin(""); setPhotoPinErr(false); setPhotoTarget(null); }}
+          style={{ position:"absolute", inset:0, background:"rgba(15,23,42,0.5)",
+            display:"flex", alignItems:"flex-end", justifyContent:"center", zIndex:70,
+            backdropFilter:"blur(4px)", WebkitBackdropFilter:"blur(4px)" }}>
+          <div onClick={e=>e.stopPropagation()}
+            style={{ width:"100%", background:T.card, borderRadius:"18px 18px 0 0", padding:"18px 18px 24px", boxShadow:T.shadowLg }}>
+            <PinKeypad pin={photoPin} setPin={setPhotoPin} pinErr={photoPinErr} setPinErr={setPhotoPinErr}
+              title="Schimbă poza"
+              onSuccess={()=>{setPhotoUnlocked(photoTarget);setShowPhotoPin(false);setPhotoPin("");setPhotoTarget(null);}} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

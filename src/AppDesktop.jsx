@@ -558,28 +558,26 @@ export default function SepticaClubDesktop() {
                   display:"flex",alignItems:"center",gap:14,
                 }}>
                   <div style={{position:"relative",cursor:"pointer",flexShrink:0}}
-                    onClick={()=>{ if(photoUnlocked!==alias) requestPhotoChange(alias); }}>
+                    onClick={()=>{
+                      if(photoUnlocked===alias){
+                        document.getElementById(`pu-${alias}`).click();
+                      } else {
+                        requestPhotoChange(alias);
+                      }
+                    }}>
                     {profilePhotos[alias]
-                      ?<img src={profilePhotos[alias]} alt={alias} style={{width:48,height:48,borderRadius:"50%",objectFit:"cover"}}/>
+                      ?<img src={profilePhotos[alias]} alt={alias} style={{width:48,height:48,borderRadius:"50%",objectFit:"cover",
+                        outline:photoUnlocked===alias?"2px solid #22C55E":"none",outlineOffset:2}}/>
                       :<Avatar alias={alias} size={48}/>}
                     <div style={{position:"absolute",bottom:0,right:0,width:16,height:16,borderRadius:"50%",
-                      background:"rgba(255,255,255,0.9)",display:"flex",alignItems:"center",justifyContent:"center",
-                      fontSize:8,boxShadow:"0 1px 3px rgba(0,0,0,0.15)"}}>✎</div>
+                      background:photoUnlocked===alias?"#22C55E":"rgba(255,255,255,0.9)",
+                      display:"flex",alignItems:"center",justifyContent:"center",
+                      fontSize:8,boxShadow:"0 1px 3px rgba(0,0,0,0.15)",
+                      color:photoUnlocked===alias?"#fff":"inherit"}}>{photoUnlocked===alias?"📷":"✎"}</div>
                     <input id={`pu-${alias}`} type="file" accept="image/*" style={{display:"none"}}
                       onClick={e=>e.stopPropagation()}
                       onChange={e=>{e.stopPropagation();handlePhotoUpload(alias,e.target.files[0]);}}/>
                   </div>
-                  {photoUnlocked===alias&&(
-                    <label onClick={e=>e.stopPropagation()}
-                      style={{fontSize:11,fontWeight:600,color:T.accent,cursor:"pointer",
-                        background:T.muted,borderRadius:T.r,padding:"4px 10px",
-                        border:`1px solid ${T.border}`,marginLeft:-8,position:"relative",overflow:"hidden"}}>
-                      📷 Alege poza
-                      <input type="file" accept="image/*"
-                        style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",opacity:0,cursor:"pointer"}}
-                        onChange={e=>{e.stopPropagation();handlePhotoUpload(alias,e.target.files[0]);}} />
-                    </label>
-                  )}
                   <div>
                     <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
                       <span style={{fontSize:15,fontWeight:700,color:T.text}}>{p.full}</span>

@@ -578,24 +578,27 @@ export default function SepticaClub() {
           <div style={{ flex:1, overflowY:"auto", paddingBottom:BOTTOM_BAR }}>
             <div style={{ background:heroBg, padding:"24px 20px 20px", textAlign:"center" }}>
               <div style={{ position:"relative", display:"inline-block", cursor:"pointer" }}
-                onClick={()=>{ if(photoUnlocked!==alias) requestPhotoChange(alias); }}>
+                onClick={()=>{
+                  if(photoUnlocked===alias){
+                    document.getElementById(`pu-${alias}`).click();
+                  } else {
+                    requestPhotoChange(alias);
+                  }
+                }}>
                 {profilePhotos[alias]
-                  ?<img src={profilePhotos[alias]} alt={alias} style={{ width:64, height:64, borderRadius:"50%", objectFit:"cover", border:"3px solid rgba(255,255,255,0.6)" }}/>
+                  ?<img src={profilePhotos[alias]} alt={alias} style={{ width:64, height:64, borderRadius:"50%", objectFit:"cover",
+                    border:photoUnlocked===alias?"3px solid #fff":"3px solid rgba(255,255,255,0.6)",
+                    animation:photoUnlocked===alias?"pulse 1.5s infinite":"none" }}/>
                   :<Avatar alias={alias} size={64} />}
                 <div style={{ position:"absolute", bottom:1, right:1, width:18, height:18, borderRadius:"50%",
-                  background:"rgba(255,255,255,0.9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10 }}>✎</div>
+                  background:photoUnlocked===alias?"#22C55E":"rgba(255,255,255,0.9)",
+                  display:"flex", alignItems:"center", justifyContent:"center", fontSize:10,
+                  color:photoUnlocked===alias?"#fff":"inherit" }}>{photoUnlocked===alias?"📷":"✎"}</div>
                 <input id={`pu-${alias}`} type="file" accept="image/*" style={{ display:"none" }}
                   onChange={e=>handlePhotoUpload(alias,e.target.files[0])} />
               </div>
               {photoUnlocked===alias&&(
-                <label style={{ display:"inline-block", marginTop:8, background:"rgba(255,255,255,0.25)",
-                  borderRadius:T.rFull, padding:"6px 16px", fontSize:12, fontWeight:600, color:"#fff", cursor:"pointer",
-                  border:"1px solid rgba(255,255,255,0.4)", position:"relative", overflow:"hidden" }}>
-                  📷 Alege poza
-                  <input type="file" accept="image/*"
-                    style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%", opacity:0, cursor:"pointer" }}
-                    onChange={e=>handlePhotoUpload(alias,e.target.files[0])} />
-                </label>
+                <div style={{ marginTop:6, fontSize:11, color:"rgba(255,255,255,0.85)", fontWeight:500 }}>Atinge poza pentru a alege</div>
               )}
               {p.captain&&<div style={{ display:"inline-block", marginTop:6, background:"rgba(255,255,255,0.18)",
                 borderRadius:T.rFull, padding:"2px 8px", fontSize:9, color:"#fff", textTransform:"uppercase" }}>⚑ Căpitan</div>}

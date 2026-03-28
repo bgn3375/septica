@@ -196,7 +196,9 @@ const MatchCard = ({ m, onPress, isLatest=false }) => {
   const teamColor = aWin?T.teamA:T.teamB;
   const aliases   = aWin?["Paul","BGN"]:["Laur","GxG"];
   const teamName  = aWin?"Paul & BGN":"Laur & GxG";
-  const [sW,sL]   = m.score.split("-");
+  const [sa,sb]   = m.score.split("-");
+  const sW = aWin ? sa : sb;
+  const sL = aWin ? sb : sa;
   return (
     <Card onClick={onPress} style={{ position:"relative", background:isWeekend?(aWin?T.teamASoft:T.teamBSoft):T.card }}>
       <div style={{ position:"absolute", left:0, top:0, bottom:0, width:3, background:teamColor }} />

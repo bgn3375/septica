@@ -176,7 +176,8 @@ const PinKeypad = ({pin,setPin,onSuccess,pinErr,setPinErr,title,titleColor=T.tex
 const MatchRow = ({m,onClick,isSelected=false})=>{
   const [hov,setHov]=useState(false);
   const aWin=m.winner==="A";
-  const [sW,sL]=m.score.split("-");
+  const [sa,sb]=m.score.split("-");
+  const sW=aWin?sa:sb, sL=aWin?sb:sa;
   return (
     <div onClick={onClick} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
       style={{display:"grid",gridTemplateColumns:"2fr auto 2fr auto",alignItems:"center",gap:16,
@@ -398,7 +399,8 @@ export default function SepticaClubDesktop() {
     const m=selMatch;
     if(!m) return <div style={{color:T.text3,padding:"60px 0",textAlign:"center",fontSize:14}}>Selectează un meci din listă</div>;
     const aWin=m.winner==="A";
-    const [sW,sL]=m.score.split("-");
+    const [sa2,sb2]=m.score.split("-");
+    const sW=aWin?sa2:sb2, sL=aWin?sb2:sa2;
     const heroBg=aWin?"linear-gradient(135deg,#F4845F,#E06040)":"linear-gradient(135deg,#D4A017,#B8880F)";
     return (
       <div>

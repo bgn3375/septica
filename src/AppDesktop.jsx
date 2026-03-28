@@ -337,7 +337,7 @@ export default function SepticaClubDesktop() {
               <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
                 <AvatarPair aliases={["Laur","GxG"]} size={48} light/>
               </div>
-              <div style={{fontSize:80,fontWeight:800,lineHeight:1,letterSpacing:"-0.03em",color:"rgba(255,255,255,0.35)"}}>{setsB}</div>
+              <div style={{fontSize:80,fontWeight:800,lineHeight:1,letterSpacing:"-0.03em",color:"#fff"}}>{setsB}</div>
               <div style={{fontSize:14,color:"rgba(255,255,255,0.55)",marginTop:6}}>{winsB} {winsB===1?"victorie":"victorii"}</div>
             </div>
           </div>

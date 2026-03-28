@@ -319,7 +319,7 @@ export default function SepticaClubDesktop() {
       <div style={{opacity:mounted?1:0,transition:"opacity 0.4s",display:"flex",flexDirection:"column",gap:20}}>
 
         {/* Hero */}
-        <div style={{background:`linear-gradient(135deg, rgba(27,196,160,0.82), rgba(26,159,212,0.82), rgba(26,111,212,0.82)), url('/hero.jpg')`,backgroundSize:"cover",backgroundPosition:"center top",borderRadius:T.rXl,padding:"40px 48px",
+        <div style={{background:`linear-gradient(135deg, rgba(10,120,90,0.55), rgba(10,80,140,0.55), rgba(10,50,140,0.55)), url('/hero.jpg')`,backgroundSize:"cover",backgroundPosition:"center top",borderRadius:T.rXl,padding:"40px 48px",
           boxShadow:"0 8px 32px rgba(26,159,212,0.2)"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:32}}>
             <div style={{flex:1,textAlign:"center"}}>

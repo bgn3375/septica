@@ -223,9 +223,9 @@ const MatchCard = ({ m, onPress, isLatest=false }) => {
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:3 }}>
               <div style={{ display:"flex", alignItems:"center", gap:5 }}>
                 <AvatarPair aliases={aliases} size={24} />
-                <span style={{ fontSize:isLatest?14:13, fontWeight:700, color:T.text, marginLeft:4 }}>{teamName}</span>
+                <span style={{ fontSize:14, fontWeight:700, color:T.text, marginLeft:4 }}>{teamName}</span>
               </div>
-              <ScoreDisplay sW={sW} sL={sL} size={isLatest?16:14} />
+              <ScoreDisplay sW={sW} sL={sL} size={16} />
             </div>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <span style={{ fontSize:11, color:T.text3 }}>{m.date}</span>
@@ -347,7 +347,7 @@ export default function SepticaClub() {
               display:"flex", alignItems:"center", justifyContent:"center",
               fontSize:15, fontWeight:900, color:"#fff",
               boxShadow:"0 2px 8px rgba(26,159,212,0.3)" }}>7</div>
-            <span style={{ fontSize:14, fontWeight:700, color:T.text }}>Șeptică pe Vorbite</span>
+            <span style={{ fontSize:20, fontWeight:700, color:T.text }}>Șeptică pe Vorbite</span>
           </div>
           <span style={{ fontSize:10, color:T.text3, letterSpacing:"0.06em", textTransform:"uppercase" }}>Est. 1995</span>
         </div>
@@ -399,7 +399,7 @@ export default function SepticaClub() {
       <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden", opacity:mounted?1:0, transition:"opacity 0.45s" }}>
         <TopBar />
         <div style={{ flex:1, overflowY:"auto", padding:"10px 10px 0" }}>
-          <Card style={{ marginBottom:10, background:`linear-gradient(135deg, rgba(27,196,160,0.82), rgba(26,159,212,0.82), rgba(26,111,212,0.82)), url('/hero.jpg')`, backgroundSize:"cover", backgroundPosition:"center top", border:"none", boxShadow:"0 6px 20px rgba(26,159,212,0.22)" }}>
+          <Card style={{ marginBottom:10, background:`linear-gradient(135deg, rgba(10,120,90,0.55), rgba(10,80,140,0.55), rgba(10,50,140,0.55)), url('/hero.jpg')`, backgroundSize:"cover", backgroundPosition:"center top", border:"none", boxShadow:"0 6px 20px rgba(26,159,212,0.22)" }}>
             <div style={{ padding:"14px 16px 8px" }}>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
                 <div style={{ flex:1, textAlign:"center" }}>

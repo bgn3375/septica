@@ -18,6 +18,33 @@ export async function savePhoto(alias, dataUrl) {
   if (error) console.error("savePhoto:", error);
 }
 
+// ── MATCHES ──────────────────────────────────────────────────────────────
+
+export async function loadMatches() {
+  const { data, error } = await supabase.from("matches").select("*").order("id", { ascending: false });
+  if (error) { console.error("loadMatches:", error); return null; }
+  return (data || []).map(r => ({ ...r, partide: r.partide || [] }));
+}
+
+export async function upsertMatch(match) {
+  const { error } = await supabase.from("matches").upsert(match);
+  if (error) console.error("upsertMatch:", error);
+}
+
+export async function deleteMatchDb(id) {
+  const { error } = await supabase.from("matches").delete().eq("id", id);
+  if (error) console.error("deleteMatch:", error);
+}
+
+export async function syncInitialMatches(initialMatches) {
+  const remote = await loadMatches();
+  if (remote && remote.length > 0) return remote;
+  for (const m of initialMatches) await upsertMatch(m);
+  return initialMatches;
+}
+
+// ── PHOTOS ───────────────────────────────────────────────────────────────
+
 export async function syncLocalToSupabase() {
   try {
     const local = JSON.parse(localStorage.getItem("septica_photos") || "{}");

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { loadPhotos, savePhoto, syncLocalToSupabase } from "./supabase.js";
+import { loadPhotos, savePhoto, syncLocalToSupabase, syncInitialMatches, upsertMatch, deleteMatchDb } from "./supabase.js";
 
 // ── THEME ─────────────────────────────────────────────────────────────────
 const T = {
@@ -309,6 +309,12 @@ export default function SepticaClub() {
     });
   },[]);
 
+  useEffect(()=>{
+    syncInitialMatches(INITIAL_MATCHES).then(data=>{
+      if(data) setMatches(data);
+    });
+  },[]);
+
   const handlePhotoUpload = useCallback((alias,file)=>{
     if(!file) return;
     const r = new FileReader();
@@ -326,7 +332,7 @@ export default function SepticaClub() {
   const openPlayer  = useCallback(alias=>setSelPlayer(alias),[]);
   const openAdd     = useCallback(()=>{ setEditMatch(null); setShowPin(true); },[]);
   const openEdit    = useCallback(m=>{ setEditMatch(m); setShowPin(true); },[]);
-  const deleteMatch = useCallback(id=>{ setMatches(prev=>prev.filter(m=>m.id!==id)); setPage("meciuri"); },[]);
+  const deleteMatch = useCallback(id=>{ setMatches(prev=>prev.filter(m=>m.id!==id)); deleteMatchDb(id); setPage("meciuri"); },[]);
 
   const playerStats = calcStats(matches);
 
@@ -673,6 +679,8 @@ export default function SepticaClub() {
   const AddMatchPage = () => {
     const isEdit=!!editMatch;
     const scrollRef=useRef(null), dateRef=useRef(null);
+    const weekendRef=useRef(null), locationRef=useRef(null), quoteRef=useRef(null);
+    const scoreARef=useRef(null), scoreBRef=useRef(null);
     const [type,   setType]   = useState(isEdit?(editMatch.weekend?"weekend":"normal"):"normal");
     const [winner, setWinner] = useState(isEdit?editMatch.winner:null);
     const [jocuri, setJocuri] = useState(()=>{
@@ -728,10 +736,10 @@ export default function SepticaClub() {
             <Card style={{ marginBottom:12, padding:"12px" }}>
               <div style={{ marginBottom:10 }}>
                 <label style={lbl}>Numele finalei</label>
-                <input style={inp} placeholder="ex: Finala 2026" defaultValue={isEdit?editMatch.weekend||"":""} />
+                <input ref={weekendRef} style={inp} placeholder="ex: Finala 2026" defaultValue={isEdit?editMatch.weekend||"":""} />
               </div>
               <label style={lbl}>Locație</label>
-              <input style={inp} placeholder="ex: București" defaultValue={isEdit?editMatch.location||"":""} />
+              <input ref={locationRef} style={inp} placeholder="ex: București" defaultValue={isEdit?editMatch.location||"":""} />
             </Card>
           )}
           <Card style={{ marginBottom:12, padding:"12px" }}>
@@ -773,7 +781,7 @@ export default function SepticaClub() {
                 {["Paul & BGN","Laur & GxG"].map((lbl2,i)=>(
                   <div key={i} style={{ flex:1, textAlign:"center" }}>
                     <div style={{ fontSize:10, color:T.text3, marginBottom:4 }}>{lbl2}</div>
-                    <input style={{ ...inp, textAlign:"center", fontSize:20, fontWeight:800, padding:"7px" }}
+                    <input ref={i===0?scoreARef:scoreBRef} style={{ ...inp, textAlign:"center", fontSize:20, fontWeight:800, padding:"7px" }}
                       type="number" min="0" placeholder="0"
                       defaultValue={isEdit?(i===0?editMatch.score.split("-")[0]:editMatch.score.split("-")[1]):""} />
                   </div>
@@ -783,11 +791,50 @@ export default function SepticaClub() {
           )}
           <Card style={{ marginBottom:12, padding:"12px" }}>
             <label style={lbl}>Comentariu <span style={{ color:T.text3, fontWeight:400, textTransform:"none" }}>(opțional)</span></label>
-            <textarea style={{ ...inp, height:60, resize:"none" }}
+            <textarea ref={quoteRef} style={{ ...inp, height:60, resize:"none" }}
               placeholder='ex: "Seara în care nimeni nu a dormit..."'
               defaultValue={isEdit?(editMatch.quote||""):""} />
           </Card>
-          <GradBtn onClick={()=>{ setShowAdd(false); setEditMatch(null); setShowPin(false); }} full>
+          <GradBtn onClick={()=>{
+            const dateVal = dateRef.current?.value || fmtDate(new Date());
+            const dateParts = dateVal.split("-");
+            const dateStr = dateParts.length===3 ? `${dateParts[2]} ${MONTHS[Number(dateParts[1])-1]} ${dateParts[0].slice(-2)}` : dateVal;
+            const quoteVal = quoteRef.current?.value?.trim() || "";
+            const locationVal = locationRef.current?.value?.trim() || "";
+            const weekendVal = weekendRef.current?.value?.trim() || "";
+            let match;
+            if(type==="weekend"){
+              const sA = Number(scoreARef.current?.value||0);
+              const sB = Number(scoreBRef.current?.value||0);
+              match = {
+                id: isEdit ? editMatch.id : Date.now(),
+                date: dateStr, location: locationVal, weekend: weekendVal,
+                winner: winner||"A", score:`${sA}-${sB}`, setsA:sA, setsB:sB,
+                partide:[], photos:isEdit?editMatch.photos||0:0, quote:quoteVal
+              };
+            } else {
+              const validJocuri = jocuri.filter(j=>j.a!==""&&j.b!=="");
+              const partide = validJocuri.map(j=>{
+                const a=Number(j.a), b=Number(j.b);
+                return a>b ? {setWinner:"A",W:a,L:b} : {setWinner:"B",W:b,L:a};
+              });
+              const sW = partide.filter(p=>p.setWinner===(winner||"A")).length;
+              const sL = partide.length - sW;
+              match = {
+                id: isEdit ? editMatch.id : Date.now(),
+                date: dateStr, location: locationVal, weekend:"",
+                winner: winner||"A", score:`${sW}-${sL}`,
+                partide, photos:isEdit?editMatch.photos||0:0, quote:quoteVal
+              };
+            }
+            if(isEdit){
+              setMatches(prev=>prev.map(m=>m.id===editMatch.id?match:m));
+            } else {
+              setMatches(prev=>[match,...prev]);
+            }
+            upsertMatch(match);
+            setShowAdd(false); setEditMatch(null); setShowPin(false);
+          }} full>
             {isEdit?"✓ Salvează modificările":"✓ Salvează meciul"}
           </GradBtn>
         </div>

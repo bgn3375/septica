@@ -399,7 +399,7 @@ export default function SepticaClub() {
       <div style={{ display:"flex", flexDirection:"column", flex:1, overflow:"hidden", opacity:mounted?1:0, transition:"opacity 0.45s" }}>
         <TopBar />
         <div style={{ flex:1, overflowY:"auto", padding:"10px 10px 0" }}>
-          <Card style={{ marginBottom:10, background:`linear-gradient(135deg, rgba(10,120,90,0.55), rgba(10,80,140,0.55), rgba(10,50,140,0.55)), url('/hero.jpg')`, backgroundSize:"cover", backgroundPosition:"center top", border:"none", boxShadow:"0 6px 20px rgba(26,159,212,0.22)" }}>
+          <Card style={{ marginBottom:10, background:`linear-gradient(135deg, rgba(10,120,90,0.75), rgba(10,80,140,0.75), rgba(10,50,140,0.75)), url('/hero.jpg')`, backgroundSize:"cover", backgroundPosition:"center top", border:"none", boxShadow:"0 6px 20px rgba(26,159,212,0.22)" }}>
             <div style={{ padding:"14px 16px 8px" }}>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
                 <div style={{ flex:1, textAlign:"center" }}>

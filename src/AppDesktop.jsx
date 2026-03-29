@@ -37,6 +37,8 @@ const MONTHS = ["Ian","Feb","Mar","Apr","Mai","Iun","Iul","Aug","Sep","Oct","Nov
 const fmtDate   = d => `${String(d.getDate()).padStart(2,"0")} ${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`;
 const parseDate = str => { const [dd,mmm,yy]=str.split(" "); return new Date(2000+Number(yy),Math.max(0,MONTHS.indexOf(mmm)),Number(dd)); };
 const dateYear  = str => str.split(" ")[2]||"";
+const isoDate   = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const dateToISO = str => { const d=parseDate(str); return isoDate(d); };
 
 const calcStats = matches => {
   const s={};
@@ -246,8 +248,9 @@ export default function SepticaClubDesktop() {
     });
   },[]);
 
-  // Auto-sync matches + photos from Supabase every 10s
+  // Auto-sync matches + photos from Supabase every 10s (pause while editing)
   useEffect(()=>{
+    if(showAdd) return;
     const iv = setInterval(()=>{
       loadMatches().then(data=>{
         if(data && data.length>0) setMatches(data);
@@ -260,7 +263,7 @@ export default function SepticaClubDesktop() {
       });
     }, 10000);
     return ()=>clearInterval(iv);
-  },[]);
+  },[showAdd]);
 
   const openMatch   = useCallback(m=>{setSelMatch(m);setPage("match");},[]);
   const openPlayer  = useCallback(alias=>{setSelPlayer(alias);setPage("player");},[]);
@@ -574,7 +577,8 @@ export default function SepticaClubDesktop() {
                       display:"flex",alignItems:"center",justifyContent:"center",
                       fontSize:8,boxShadow:"0 1px 3px rgba(0,0,0,0.15)",
                       color:photoUnlocked===alias?"#fff":"inherit"}}>{photoUnlocked===alias?"📷":"✎"}</div>
-                    <input id={`pu-${alias}`} type="file" accept="image/*" style={{display:"none"}}
+                    <input id={`pu-${alias}`} type="file" accept="image/*"
+                      style={{position:"absolute",top:0,left:0,width:1,height:1,opacity:0,overflow:"hidden"}}
                       onClick={e=>e.stopPropagation()}
                       onChange={e=>{e.stopPropagation();handlePhotoUpload(alias,e.target.files[0]);}}/>
                   </div>
@@ -661,8 +665,8 @@ export default function SepticaClubDesktop() {
     const [jocuri,setJocuri]= useState(()=>{
       if(isEdit&&!editMatch.weekend){
         const f=editMatch.partide.map(p=>({
-          a:p.setWinner===editMatch.winner?String(p.W):String(p.L),
-          b:p.setWinner===editMatch.winner?String(p.L):String(p.W),
+          a:p.setWinner==="A"?String(p.W):String(p.L),
+          b:p.setWinner==="A"?String(p.L):String(p.W),
         }));
         while(f.length<3) f.push({a:"",b:""});
         return f.slice(0,3);
@@ -723,7 +727,7 @@ export default function SepticaClubDesktop() {
           )}
           <Card style={{padding:"16px"}}>
             <label style={lbl}>Data</label>
-            <input ref={dateRef} style={inp} type="date" defaultValue={isEdit?editMatch.date:fmtDate(new Date())}/>
+            <input ref={dateRef} style={inp} type="date" defaultValue={isEdit?dateToISO(editMatch.date):isoDate(new Date())}/>
           </Card>
           {type==="normal"&&(
             <Card style={{padding:"16px"}}>

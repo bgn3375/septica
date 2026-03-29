@@ -41,6 +41,8 @@ const MONTHS = ["Ian","Feb","Mar","Apr","Mai","Iun","Iul","Aug","Sep","Oct","Nov
 const fmtDate  = d => `${String(d.getDate()).padStart(2,"0")} ${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`;
 const parseDate = str => { const [dd,mmm,yy] = str.split(" "); return new Date(2000+Number(yy), Math.max(0,MONTHS.indexOf(mmm)), Number(dd)); };
 const dateYear  = str => str.split(" ")[2] || "";
+const isoDate   = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const dateToISO = str => { const d=parseDate(str); return isoDate(d); };
 
 // ── STATS CALCULATOR ──────────────────────────────────────────────────────
 const calcStats = matches => {
@@ -322,8 +324,9 @@ export default function SepticaClub() {
     });
   },[]);
 
-  // Auto-sync matches + photos from Supabase every 10s
+  // Auto-sync matches + photos from Supabase every 10s (pause while editing)
   useEffect(()=>{
+    if(showAdd) return;
     const iv = setInterval(()=>{
       loadMatches().then(data=>{
         if(data && data.length>0) setMatches(data);
@@ -336,7 +339,7 @@ export default function SepticaClub() {
       });
     }, 10000);
     return ()=>clearInterval(iv);
-  },[]);
+  },[showAdd]);
 
   const handlePhotoUpload = useCallback((alias,file)=>{
     if(!file) return;
@@ -594,8 +597,10 @@ export default function SepticaClub() {
                   background:photoUnlocked===alias?"#22C55E":"rgba(255,255,255,0.9)",
                   display:"flex", alignItems:"center", justifyContent:"center", fontSize:10,
                   color:photoUnlocked===alias?"#fff":"inherit" }}>{photoUnlocked===alias?"📷":"✎"}</div>
-                <input id={`pu-${alias}`} type="file" accept="image/*" style={{ display:"none" }}
-                  onChange={e=>handlePhotoUpload(alias,e.target.files[0])} />
+                <input id={`pu-${alias}`} type="file" accept="image/*"
+                  style={{ position:"absolute", top:0, left:0, width:1, height:1, opacity:0, overflow:"hidden" }}
+                  onClick={e=>e.stopPropagation()}
+                  onChange={e=>{e.stopPropagation();handlePhotoUpload(alias,e.target.files[0]);}} />
               </div>
               {photoUnlocked===alias&&(
                 <div style={{ marginTop:6, fontSize:11, color:"rgba(255,255,255,0.85)", fontWeight:500 }}>Atinge poza pentru a alege</div>
@@ -725,8 +730,8 @@ export default function SepticaClub() {
     const [jocuri, setJocuri] = useState(()=>{
       if(isEdit&&!editMatch.weekend){
         const f=editMatch.partide.map(p=>({
-          a:p.setWinner===editMatch.winner?String(p.W):String(p.L),
-          b:p.setWinner===editMatch.winner?String(p.L):String(p.W),
+          a:p.setWinner==="A"?String(p.W):String(p.L),
+          b:p.setWinner==="A"?String(p.L):String(p.W),
         }));
         while(f.length<3) f.push({a:"",b:""});
         return f.slice(0,3);
@@ -783,7 +788,7 @@ export default function SepticaClub() {
           )}
           <Card style={{ marginBottom:12, padding:"12px" }}>
             <label style={lbl}>Data</label>
-            <input ref={dateRef} style={inp} type="date" defaultValue={isEdit?editMatch.date:fmtDate(new Date())} onFocus={scrollToDate} />
+            <input ref={dateRef} style={inp} type="date" defaultValue={isEdit?dateToISO(editMatch.date):isoDate(new Date())} onFocus={scrollToDate} />
           </Card>
           {type==="normal"&&(
             <Card style={{ marginBottom:12, padding:"12px" }}>
